@@ -1,179 +1,218 @@
 # 📄 Llama-3.3-70B Document RAG QA
 
-### ⚡ High-Performance RAG-based PDF Question Answering using Groq + LangChain + Streamlit
+### ⚡ Fast PDF Question Answering using Groq + LangChain + Streamlit
 
-An advanced **Retrieval Augmented Generation (RAG)** based PDF Question
-Answering application powered by:
+A production-ready **Retrieval Augmented Generation (RAG)** application that allows users to upload a PDF and ask questions about its content using:
 
--   🧠 **Llama-3.3-70B-Versatile (via Groq API)**
--   🔗 **LangChain**
--   📚 **Chroma Vector Database**
--   🤗 **HuggingFace Embeddings**
--   🌐 **Streamlit UI**
+* 🧠 **Llama-3.3-70B-Versatile (Groq API)**
+* 🔗 **LangChain**
+* 🗄 **Chroma Vector Store**
+* 🤗 **HuggingFace Embeddings**
+* 🌐 **Streamlit UI**
 
-This app allows users to upload PDF documents and ask questions based on
-their content using a blazing-fast LLM inference engine powered by
-**Groq**.
+This app is fully deployable on **Streamlit Cloud**.
 
-------------------------------------------------------------------------
+---
 
 # 🚀 Features
 
--   📤 Upload one or multiple PDF files
--   🔍 Automatic document chunking & embedding
--   🗄️ Vector storage using ChromaDB
--   ⚡ Lightning-fast inference with Groq
--   🤖 Llama-3.3-70B model integration
--   💬 Conversational question answering
--   🧠 Context-aware RAG pipeline
--   🌍 Streamlit Web Interface
--   ☁️ Deployable on Streamlit Cloud
+* 📤 Upload a PDF document
+* 🔍 Automatic text chunking
+* 🧠 Embedding generation using HuggingFace
+* 🗄 In-memory Chroma vector database
+* ⚡ High-speed LLM inference via Groq
+* 💬 Context-aware Question Answering
+* ☁️ Cloud deployable
+* 🔐 Secure API key using Streamlit Secrets
 
-------------------------------------------------------------------------
+---
 
 # 🏗️ Architecture
 
-User Question\
-↓\
-Retriever (Chroma)\
-↓\
-Relevant Document Chunks\
-↓\
-Llama-3.3-70B (Groq API)\
-↓\
+User Uploads PDF     
+   ↓
+
+PyPDFLoader
+    
+  ↓
+
+Text Splitting
+  
+  ↓
+
+HuggingFace Embeddings
+  
+  ↓
+
+Chroma Vector Store
+  
+  ↓
+
+Retriever
+  
+  ↓
+
+Llama-3.3-70B (Groq)
+  
+  ↓
+
 Final Answer
 
-------------------------------------------------------------------------
+---
 
 # 📦 Tech Stack
 
-  Component      Technology
-  -------------- --------------------------------
-  LLM            Llama-3.3-70B-Versatile (Groq)
-  Framework      LangChain
-  Embeddings     HuggingFace Transformers
-  Vector Store   ChromaDB
-  Backend        Python
-  UI             Streamlit
-  Deployment     Streamlit Cloud
+| Component    | Technology                          |
+| ------------ | ----------------------------------- |
+| LLM          | Llama-3.3-70B-Versatile (Groq)      |
+| Framework    | LangChain                           |
+| Embeddings   | HuggingFace (sentence-transformers) |
+| Vector Store | Chroma                              |
+| UI           | Streamlit                           |
+| PDF Loader   | PyPDF                               |
+| Deployment   | Streamlit Cloud                     |
 
-------------------------------------------------------------------------
+---
 
-# 🛠️ Installation (Local Setup)
+# 🛠️ Local Setup
 
 ## 1️⃣ Clone Repository
 
-``` bash
-git clone https://github.com/your-username/pdfQAapp.git
-cd pdfQAapp
+```bash
+git clone https://github.com/your-username/pdf-qa-app.git
+cd pdf-qa-app
 ```
 
 ## 2️⃣ Create Virtual Environment (Python 3.10 Recommended)
 
-``` bash
+```bash
 py -3.10 -m venv venv
 venv\Scripts\activate
 ```
 
-## 3️⃣ Install Dependencies
+## 3️⃣ Install Requirements
 
-``` bash
+```bash
 pip install -r requirements.txt
 ```
 
-------------------------------------------------------------------------
+---
 
-# 🔑 Environment Variables
+# 📄 requirements.txt
 
-Create a `.env` file in root directory:
-
-    GROQ_API_KEY=your_groq_api_key_here
-
-------------------------------------------------------------------------
-
-# 🌐 Run Application
-
-``` bash
-streamlit run app.py
+```txt
+streamlit==1.33.0
+langchain==0.1.20
+langchain-core==0.1.53
+langchain-community==0.0.38
+langchain-text-splitters==0.0.2
+langchain-huggingface==0.0.3
+langchain-groq==0.1.3
+chromadb==0.5.23
+sentence-transformers==2.7.0
+pypdf==4.2.0
 ```
 
-Then open:\
-http://localhost:8501
+---
 
-------------------------------------------------------------------------
+# 🔑 API Key Setup
+
+This app uses **Streamlit Secrets** instead of `.env`.
+
+## Local Development
+
+Create a file:
+
+```
+.streamlit/secrets.toml
+```
+
+Add:
+
+```toml
+GROQ_API_KEY = "your_actual_groq_api_key"
+```
+
+---
 
 # ☁️ Deploy on Streamlit Cloud
 
-1.  Push code to GitHub\
-2.  Open Streamlit Cloud\
-3.  Deploy new app\
-4.  Add secret in **App Settings → Secrets**
+1. Push project to GitHub
+2. Go to Streamlit Cloud
+3. Deploy new app
+4. Go to **App Settings → Secrets**
+5. Add:
 
-```{=html}
-<!-- -->
+```toml
+GROQ_API_KEY = "your_actual_groq_api_key"
 ```
-    GROQ_API_KEY = "your_actual_key_here"
 
-5.  Deploy 🚀
+6. Deploy 🚀
 
-------------------------------------------------------------------------
+---
 
-# 🧠 Model Details
+# ▶️ Run Locally
 
-### 🔥 Llama-3.3-70B-Versatile
+```bash
+streamlit run app.py
+```
 
--   70 Billion parameters
--   Optimized for reasoning & instruction following
--   High-speed inference via Groq
--   Low latency RAG response generation
+Open:
 
-------------------------------------------------------------------------
+```
+http://localhost:8501
+```
+
+---
 
 # 📁 Project Structure
 
-    pdfQAapp/
-    │
-    ├── app.py
-    ├── requirements.txt
-    ├── .env
-    ├── README.md
-    └── vectorstore/
+```
+pdf-qa-app/
+│
+├── app.py
+├── requirements.txt
+├── README.md
+├── .streamlit/
+│    └── secrets.toml
+└── temp.pdf (generated automatically)
+```
 
-------------------------------------------------------------------------
+---
 
 # ⚠️ Important Notes
 
--   Use **Python 3.10 (64-bit)** for best compatibility
--   Do NOT use 32-bit Python
--   Keep your API keys secure
--   Never upload `.env` to GitHub
--   Use `.gitignore` to protect secrets
+* ✅ Use **Python 3.10 (64-bit)**
+* ❌ Do NOT use 32-bit Python
+* 🔐 Never commit secrets.toml
+* 📌 HuggingFace model loads once (cached)
+* ☁️ Fully Streamlit Cloud compatible
 
-------------------------------------------------------------------------
+---
+
+# 🧠 Model Info
+
+### Llama-3.3-70B-Versatile
+
+* 70B parameters
+* Strong reasoning capabilities
+* Low latency via Groq hardware acceleration
+* Excellent for RAG pipelines
+
+---
 
 # 👩‍💻 Author
 
-**Aishwarya Gupta**\
-B.Tech CSE (AI Specialization)\
-RAG \| GenAI \| LangChain \| LLM Applications
+**Aishwarya Gupta**
+B.Tech CSE (AI Specialization)
+GenAI | RAG | LangChain | LLM Applications
 
-------------------------------------------------------------------------
+---
 
-# ⭐ If You Like This Project
+# ⭐ This project demonstrates:
 
-Give it a ⭐ on GitHub\
-Fork & Improve\
-Use it in your AI portfolio
-
-------------------------------------------------------------------------
-
-# 🏁 Conclusion
-
-This project demonstrates a production-ready:
-
-✅ Retrieval Augmented Generation system\
-✅ Groq LLM integration\
-✅ LangChain orchestration\
-✅ Real-time Streamlit deployment
-
-A powerful addition to any AI/ML engineer's portfolio.
+✅ Production RAG pipeline
+✅ Secure API management
+✅ Groq LLM integration
+✅ Vector database usage
+✅ Streamlit cloud deployment
