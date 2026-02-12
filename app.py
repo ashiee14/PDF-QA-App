@@ -9,7 +9,7 @@ import tempfile
 
 st.set_page_config(page_title="PDF QA with Llama 3.3", layout="wide")
 
-st.title("📄 Llama-3.3-70B Document RAG QA")
+st.title("📄 Llama-3.3-70B Document RAG QA with Groq and LangChain")
 
 # Check GROQ key
 if "GROQ_API_KEY" not in st.secrets:
@@ -59,3 +59,4 @@ if uploaded_file:
         with st.spinner("Thinking..."):
             response = qa.invoke({"query": query})
             st.success(response["result"])
+
