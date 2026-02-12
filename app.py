@@ -12,7 +12,7 @@ st.set_page_config(page_title="PDF QA with Llama 3.3", layout="wide")
 
 st.title("📄 Llama-3.3-70B Document RAG QA")
 
-# ✅ Use Streamlit secrets (NOT os.getenv)
+# Streamlit secrets 
 if "GROQ_API_KEY" not in st.secrets:
     st.error("GROQ_API_KEY missing. Add it in Streamlit Secrets.")
     st.stop()
@@ -27,7 +27,7 @@ uploaded_file = st.file_uploader("Upload PDF", type="pdf")
 
 if uploaded_file:
 
-    # ✅ Use temporary file (better for cloud)
+    #  temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
         tmp.write(uploaded_file.read())
         temp_path = tmp.name
@@ -42,9 +42,13 @@ if uploaded_file:
 
     texts = splitter.split_documents(documents)
 
-    embeddings = HuggingFaceEmbeddings()
+   @st.cache_resource
+   def load_embeddings():
+        return HuggingFaceEmbeddings()
 
-    # ✅ Use Chroma instead of FAISS (Cloud-friendly)
+    embeddings = load_embeddings()
+
+    # Using Chroma 
     vectorstore = Chroma.from_documents(
         documents=texts,
         embedding=embeddings
@@ -61,3 +65,4 @@ if uploaded_file:
         with st.spinner("Thinking..."):
             response = qa.invoke({"query": query})
             st.success(response["result"])
+
