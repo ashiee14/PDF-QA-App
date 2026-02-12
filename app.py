@@ -1,34 +1,38 @@
 import streamlit as st
-import os
 from langchain_groq import ChatGroq
-from langchain.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_chroma import Chroma
 from langchain.chains import RetrievalQA
+import tempfile
+import os
 
 st.set_page_config(page_title="PDF QA with Llama 3.3", layout="wide")
 
 st.title("📄 Llama-3.3-70B Document RAG QA")
 
-groq_api_key = os.getenv("GROQ_API_KEY")
-
-if not groq_api_key:
+# ✅ Use Streamlit secrets (NOT os.getenv)
+if "GROQ_API_KEY" not in st.secrets:
     st.error("GROQ_API_KEY missing. Add it in Streamlit Secrets.")
     st.stop()
 
 llm = ChatGroq(
-    groq_api_key=groq_api_key,
-    model_name="llama-3.3-70b-versatile",
+    groq_api_key=st.secrets["GROQ_API_KEY"],
+    model="llama-3.3-70b-versatile",
+    temperature=0
 )
 
 uploaded_file = st.file_uploader("Upload PDF", type="pdf")
 
 if uploaded_file:
-    with open("temp.pdf", "wb") as f:
-        f.write(uploaded_file.read())
 
-    loader = PyPDFLoader("temp.pdf")
+    # ✅ Use temporary file (better for cloud)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        tmp.write(uploaded_file.read())
+        temp_path = tmp.name
+
+    loader = PyPDFLoader(temp_path)
     documents = loader.load()
 
     splitter = RecursiveCharacterTextSplitter(
@@ -39,7 +43,12 @@ if uploaded_file:
     texts = splitter.split_documents(documents)
 
     embeddings = HuggingFaceEmbeddings()
-    vectorstore = FAISS.from_documents(texts, embeddings)
+
+    # ✅ Use Chroma instead of FAISS (Cloud-friendly)
+    vectorstore = Chroma.from_documents(
+        documents=texts,
+        embedding=embeddings
+    )
 
     qa = RetrievalQA.from_chain_type(
         llm=llm,
@@ -49,5 +58,6 @@ if uploaded_file:
     query = st.text_input("Ask a question about the PDF:")
 
     if query:
-        response = qa.run(query)
-        st.write(response)
+        with st.spinner("Thinking..."):
+            response = qa.invoke({"query": query})
+            st.success(response["result"])
