@@ -42,8 +42,8 @@ if uploaded_file:
 
     texts = splitter.split_documents(documents)
 
-   @st.cache_resource
-   def load_embeddings():
+    @st.cache_resource
+    def load_embeddings():
         return HuggingFaceEmbeddings()
 
     embeddings = load_embeddings()
@@ -65,4 +65,5 @@ if uploaded_file:
         with st.spinner("Thinking..."):
             response = qa.invoke({"query": query})
             st.success(response["result"])
+
 
