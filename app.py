@@ -1,5 +1,12 @@
 import os
 import streamlit as st
+
+groq_api_key = os.getenv("GROQ_API_KEY")
+
+if not groq_api_key:
+    st.error("GROQ_API_KEY not found. Please set it in Streamlit Secrets.")
+    st.stop()
+
 from rag_utility import process_document_to_chroma_db, answer_question
 
 working_dir = os.path.dirname(os.path.abspath(__file__))
@@ -39,3 +46,4 @@ if st.session_state.doc_processed:
 
         st.markdown("### Llama-3.3-70B Answer:")
         st.write(answer)
+
