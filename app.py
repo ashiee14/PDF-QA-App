@@ -1,49 +1,53 @@
-import os
 import streamlit as st
+import os
+from langchain_groq import ChatGroq
+from langchain.document_loaders import PyPDFLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.chains import RetrievalQA
+
+st.set_page_config(page_title="PDF QA with Llama 3.3", layout="wide")
+
+st.title("📄 Llama-3.3-70B Document RAG QA")
 
 groq_api_key = os.getenv("GROQ_API_KEY")
 
 if not groq_api_key:
-    st.error("GROQ_API_KEY not found. Please set it in Streamlit Secrets.")
+    st.error("GROQ_API_KEY missing. Add it in Streamlit Secrets.")
     st.stop()
 
-from rag_utility import process_document_to_chroma_db, answer_question
+llm = ChatGroq(
+    groq_api_key=groq_api_key,
+    model_name="llama-3.3-70b-versatile",
+)
 
-working_dir = os.path.dirname(os.path.abspath(__file__))
+uploaded_file = st.file_uploader("Upload PDF", type="pdf")
 
-st.set_page_config(page_title="Document RAG QA", layout="centered")
-st.title("Llama-3.3-70B Document RAG QA with Groq and LangChain")
+if uploaded_file:
+    with open("temp.pdf", "wb") as f:
+        f.write(uploaded_file.read())
 
-# Session state flag
-if "doc_processed" not in st.session_state:
-    st.session_state.doc_processed = False
+    loader = PyPDFLoader("temp.pdf")
+    documents = loader.load()
 
-# File uploader
-uploaded_file = st.file_uploader("Upload a PDF document", type=["pdf"])
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=200
+    )
 
-if uploaded_file is not None and not st.session_state.doc_processed:
+    texts = splitter.split_documents(documents)
 
-    save_path = os.path.join(working_dir, uploaded_file.name)
+    embeddings = HuggingFaceEmbeddings()
+    vectorstore = FAISS.from_documents(texts, embeddings)
 
-    with open(save_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
+    qa = RetrievalQA.from_chain_type(
+        llm=llm,
+        retriever=vectorstore.as_retriever()
+    )
 
-    with st.spinner("Processing document... This may take a few seconds..."):
-        process_document_to_chroma_db(uploaded_file.name)
+    query = st.text_input("Ask a question about the PDF:")
 
-    st.session_state.doc_processed = True
-    st.success("Document processed successfully!")
-
-# Only show question box AFTER processing
-if st.session_state.doc_processed:
-
-    user_question = st.text_input("Enter your question")
-
-    if st.button("Get Answer"):
-
-        with st.spinner("Generating answer..."):
-            answer = answer_question(user_question)
-
-        st.markdown("### Llama-3.3-70B Answer:")
-        st.write(answer)
-
+    if query:
+        response = qa.run(query)
+        st.write(response)
