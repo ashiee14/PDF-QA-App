@@ -7,7 +7,7 @@ from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 import tempfile
 
-st.set_page_config(page_title="PDF QA with Llama 3.3", layout="wide")
+st.set_page_config(page_title="PDF QA application using RAG", layout="wide")
 
 st.title("Document RAG QA with Groq and LangChain")
 
