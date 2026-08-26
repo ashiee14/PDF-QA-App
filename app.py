@@ -9,7 +9,7 @@ import tempfile
 
 st.set_page_config(page_title="PDF QA with Llama 3.3", layout="wide")
 
-st.title("📄 Llama-3.3-70B Document RAG QA with Groq and LangChain")
+st.title("Document RAG QA with Groq and LangChain")
 
 # Check GROQ key
 if "GROQ_API_KEY" not in st.secrets:
@@ -18,7 +18,7 @@ if "GROQ_API_KEY" not in st.secrets:
 
 llm = ChatGroq(
     groq_api_key=st.secrets["GROQ_API_KEY"],
-    model="llama-3.3-70b-versatile",
+    model="openai/gpt-oss-20b",
     temperature=0
 )
 
